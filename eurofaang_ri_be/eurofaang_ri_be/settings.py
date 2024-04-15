@@ -149,4 +149,7 @@ CORS_ALLOWED_ORIGINS = [
    "http://localhost:4200",
 ]
 
+
+CSRF_TRUSTED_ORIGINS = ['https://dcc-eurofaang-ri-be-4qewew6boq-nw.a.run.app']
+
 AUTH_USER_MODEL = 'users.User'
