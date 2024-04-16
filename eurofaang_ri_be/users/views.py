@@ -25,5 +25,12 @@ class UserLogIn(ObtainAuthToken):
         return Response({
             'token': token.key,
             'id': user.pk,
-            'username': user.username
+            'username': user.username,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email,
+            'phone_number': user.phone_number,
+            'organization_name': user.organization_name,
+            'organization_address': user.organization_address,
+            'role': user.role
         })

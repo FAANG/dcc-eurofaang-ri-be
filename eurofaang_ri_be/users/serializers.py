@@ -4,14 +4,14 @@ from .models import User
 
 class UserSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
-    username = serializers.CharField(required=True, allow_blank=False)
-    first_name = serializers.CharField(required=True, allow_blank=False)
-    last_name = serializers.CharField(required=True, allow_blank=False)
-    email = serializers.CharField(required=True, allow_blank=False)
-    phone_number = serializers.CharField(required=True, allow_blank=False)
-    organization_name = serializers.CharField(required=True, allow_blank=False)
-    organization_address = serializers.CharField(required=True, allow_blank=False)
-    role = serializers.CharField(required=True, allow_blank=False)
+    username = serializers.CharField(required=False, allow_blank=True)
+    first_name = serializers.CharField(required=False, allow_blank=True)
+    last_name = serializers.CharField(required=False, allow_blank=True)
+    email = serializers.CharField(required=False, allow_blank=True)
+    phone_number = serializers.CharField(required=False, allow_blank=True)
+    organization_name = serializers.CharField(required=False, allow_blank=True)
+    organization_address = serializers.CharField(required=False, allow_blank=True)
+    role = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = User

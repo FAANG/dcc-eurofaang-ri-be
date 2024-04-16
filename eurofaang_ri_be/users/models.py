@@ -3,7 +3,7 @@ from django.conf import settings
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.db import models
-from phonenumber_field.modelfields import PhoneNumberField
+from django.core.validators import RegexValidator
 from rest_framework.authtoken.models import Token
 
 
@@ -16,9 +16,20 @@ class User(AbstractUser):
         ('AP', 'Additional Participant'),
     ]
 
-    phone_number = PhoneNumberField()
-    organization_name = models.CharField()
-    organization_address = models.CharField()
+    phone_number = models.CharField(
+        max_length=16,
+        validators=[
+            RegexValidator(
+                regex=r'^\+\d{8,15}$',
+                message="Phone number must be entered in the format: '+99999999'. Up to 15 digits is allowed."
+            ),
+        ],
+        blank=True,
+        null=True
+    )
+
+    organization_name = models.CharField(max_length=255, blank=True, null=True)
+    organization_address = models.CharField(max_length=255, blank=True, null=True)
     role = models.CharField(max_length=2, choices=ROLE_CHOICES, default='PI')
 
 
