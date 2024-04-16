@@ -32,5 +32,6 @@ class UserLogIn(ObtainAuthToken):
             'phone_number': user.phone_number,
             'organization_name': user.organization_name,
             'organization_address': user.organization_address,
+            'organization_country': user.organization_country,
             'role': user.role
         })

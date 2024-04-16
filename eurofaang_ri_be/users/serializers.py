@@ -11,10 +11,11 @@ class UserSerializer(serializers.ModelSerializer):
     phone_number = serializers.CharField(required=False, allow_blank=True)
     organization_name = serializers.CharField(required=False, allow_blank=True)
     organization_address = serializers.CharField(required=False, allow_blank=True)
+    organization_country = serializers.CharField(required=False, allow_blank=True)
     role = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = User
         fields = ('id', 'username', 'first_name', 'last_name', 'email', 'phone_number', 'organization_name',
-                  'organization_address', 'role')
+                  'organization_address', 'organization_country', 'role')
         read_only_fields = ('username', )

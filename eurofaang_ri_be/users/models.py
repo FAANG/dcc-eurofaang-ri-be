@@ -6,10 +6,14 @@ from django.db import models
 from django.core.validators import RegexValidator
 from rest_framework.authtoken.models import Token
 
+from .validation.countries import COUNTRIES
+
 
 class User(AbstractUser):
     def __str__(self):
         return self.username
+
+    COUNTRIES_CHOICES = [(str(i), COUNTRIES[i]) for i in range(len(COUNTRIES))]
 
     ROLE_CHOICES = [
         ('PI', 'Principal Investigator'),
@@ -30,6 +34,7 @@ class User(AbstractUser):
 
     organization_name = models.CharField(max_length=255, blank=True, null=True)
     organization_address = models.CharField(max_length=255, blank=True, null=True)
+    organization_country = models.CharField(choices=COUNTRIES_CHOICES, blank=True, null=True)
     role = models.CharField(max_length=2, choices=ROLE_CHOICES, default='PI')
 
 
