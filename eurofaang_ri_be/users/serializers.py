@@ -11,8 +11,9 @@ class UserSerializer(serializers.ModelSerializer):
     phone_number = serializers.CharField(required=False, allow_blank=True)
     organization_name = serializers.CharField(required=False, allow_blank=True)
     organization_address = serializers.CharField(required=False, allow_blank=True)
-    organization_country = serializers.CharField(required=False, allow_blank=True)
-    role = serializers.CharField(required=False, allow_blank=True)
+    organization_country = serializers.CharField(source='get_organization_country_display',
+                                                 required=False, allow_blank=True)
+    role = serializers.CharField(source='get_role_display', required=False, allow_blank=True)
 
     class Meta:
         model = User

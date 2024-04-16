@@ -6,7 +6,7 @@ from django.db import models
 from django.core.validators import RegexValidator
 from rest_framework.authtoken.models import Token
 
-from .validation.countries import COUNTRIES
+from eurofaang_ri_be.constants import COUNTRIES
 
 
 class User(AbstractUser):
