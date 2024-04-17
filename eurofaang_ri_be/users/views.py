@@ -5,8 +5,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import User, TNA_Project
-from .serializers import UserSerializer, TNA_ProjectSerializer
+from .models import User, TnaProject
+from .serializers import UserSerializer, TnaProjectSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -38,8 +38,8 @@ class UserLogIn(ObtainAuthToken):
         })
 
 
-class TNA_Project_View(APIView):
+class TnaProjectView(APIView):
     def get(self, request):
-        queryset = TNA_Project.objects.all()
-        serializer = TNA_ProjectSerializer(queryset, many=True)
+        queryset = TnaProject.objects.all()
+        serializer = TnaProjectSerializer(queryset, many=True)
         return Response(serializer.data)
