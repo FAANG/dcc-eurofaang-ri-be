@@ -3,9 +3,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from .models import User
-from .serializers import UserSerializer
+from .models import User, TNA_Project
+from .serializers import UserSerializer, TNA_ProjectSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -35,3 +36,10 @@ class UserLogIn(ObtainAuthToken):
             'organization_country': user.organization_country,
             'role': user.role
         })
+
+
+class TNA_Project_View(APIView):
+    def get(self, request):
+        queryset = TNA_Project.objects.all()
+        serializer = TNA_ProjectSerializer(queryset, many=True)
+        return Response(serializer.data)
