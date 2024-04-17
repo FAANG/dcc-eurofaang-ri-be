@@ -38,6 +38,25 @@ class User(AbstractUser):
     role = models.CharField(max_length=2, choices=ROLE_CHOICES, default='PI')
 
 
+class TNA_Project(models.Model):
+
+    def __str__(self):
+        return self.title
+
+    users = models.ManyToManyField(User)
+
+    another_application = models.CharField()
+    another_application_link = models.ForeignKey('self', on_delete=models.CASCADE)
+    title = models.CharField()
+    research_installation_1 = models.CharField()
+    research_installation_2 = models.CharField()
+    research_installation_3 = models.CharField()
+
+    context = models.CharField(max_length=1500)
+    objectives = models.CharField(max_length=500)
+    impact = models.CharField(max_length=1000)
+
+
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
