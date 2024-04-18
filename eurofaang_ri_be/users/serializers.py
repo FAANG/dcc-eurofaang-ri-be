@@ -25,10 +25,10 @@ class UserSerializer(serializers.ModelSerializer):
 class TnaProjectSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
 
-    users = UserSerializer(read_only=True, many=True)
+    users = serializers.PrimaryKeyRelatedField(read_only=True, many=True)
 
     another_application = serializers.CharField(required=True, allow_blank=False)
-    another_application_link = serializers.CharField(required=True, allow_blank=False)
+    another_application_link = serializers.CharField(required=False, allow_blank=True)
     title = serializers.CharField(required=True, allow_blank=False)
     research_installation_1 = serializers.CharField(required=True, allow_blank=False)
     research_installation_2 = serializers.CharField(required=True, allow_blank=False)

@@ -43,10 +43,15 @@ class TnaProject(models.Model):
     def __str__(self):
         return self.title
 
+    YES_NO_CHOICES = (
+        ('yes', 'Yes'),
+        ('no', 'No'),
+    )
+
     users = models.ManyToManyField(User)
 
-    another_application = models.CharField()
-    another_application_link = models.ForeignKey('self', on_delete=models.CASCADE)
+    another_application = models.CharField(choices=YES_NO_CHOICES)
+    another_application_link = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField()
     research_installation_1 = models.CharField()
     research_installation_2 = models.CharField()
