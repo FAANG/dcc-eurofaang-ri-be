@@ -4,6 +4,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.db import models
 from django.core.validators import RegexValidator
+from django.core.exceptions import ValidationError
 from rest_framework.authtoken.models import Token
 
 from eurofaang_ri_be.constants import COUNTRIES
@@ -60,6 +61,13 @@ class TnaProject(models.Model):
     context = models.CharField(max_length=1500)
     objectives = models.CharField(max_length=500)
     impact = models.CharField(max_length=1000)
+
+    def clean(self):
+        if self.another_application == 'yes' and not self.another_application_link:
+            raise ValidationError(
+                "In case of 'Another application' field selected as 'Yes', "
+                "the 'Another application link' cannot be empty."
+            )
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
