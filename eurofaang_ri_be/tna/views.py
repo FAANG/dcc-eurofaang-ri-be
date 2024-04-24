@@ -8,6 +8,8 @@ from users.serializers import UserSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+import random
+import string
 
 
 class TnaListAV(APIView):
@@ -18,36 +20,47 @@ class TnaListAV(APIView):
         serializer = TnaProjectSerializer(tna_projects, many=True)
         return Response(serializer.data)
 
+    def generate_username(self, participant):
+        username = (participant['firstname'][0] + participant['lastname']
+                    .join(random.choices(string.ascii_lowercase +
+                                         string.digits, k=3)))
+        return username
+
     def post(self, request):
         print(request.data)
         form_data = request.data
 
         # map front-end request to DRF model
 
-        pi_data = {
-            "username": "milou2221",
-            "first_name": form_data['principalInvestigator']['firstname'],
-            "last_name": form_data['principalInvestigator']['lastname'],
-            "email": form_data['principalInvestigator']['email'],
-            "phone_number": form_data['principalInvestigator']['phone'],
-            "organization_name": form_data['principalInvestigator']['organisation']['organisationName'],
-            "organization_address": form_data['principalInvestigator']['organisation']['organisationAddress'],
-            "organization_country": form_data['principalInvestigator']['organisation']['organisationCountry'],
-            "role": "PI"
-        }
+        participants_list = form_data['participants']['participantFields']
 
-        serializerUser = UserSerializer(data=pi_data)
-        if serializerUser.is_valid():
-            serializerUser.save()
-            print(serializerUser.data)
-        else:
-            return Response(serializerUser.errors)
+        participants_ids = []
 
-        tna_data = {'additional_participants': [1, 2, 3, 4],  # we need an id here
-                    'associated_application_title': 3,  # we need an id here
-                    'principal_investigator': serializerUser.data['id'],
+        for participant in participants_list:
+            participant_data = {
+                "username": self.generate_username(participant),
+                "first_name": participant['firstname'],
+                "last_name": participant['lastname'],
+                "email": participant['email'],
+                "phone_number": participant['phone'],
+                "organization_name": participant['organisation']['organisationName'],
+                "organization_address": participant['organisation']['organisationAddress'],
+                "organization_country": participant['organisation']['organisationCountry'],
+                "role": "AP"
+            }
+            user_serializer = UserSerializer(data=participant_data)
+            if user_serializer.is_valid():
+                user_serializer.save()
+                print(user_serializer.data)
+                participants_ids.append(user_serializer.data['id'])
+            else:
+                return Response(user_serializer.errors)
+
+        tna_data = {'additional_participants': participants_ids,
+                    'principal_investigator': form_data['principalInvestigator']['principalInvestigatorId'],
 
                     'associated_application': form_data['projectInformation']['applicationConnection'],
+                    'associated_application_title': form_data['projectInformation']['associatedProjectTitle'],
                     'project_title': form_data['projectInformation']['projectTitle'],
                     'research_installation_1': form_data['projectInformation']['preferredResearchInstallation'][
                         'preference1'],
@@ -68,12 +81,12 @@ class TnaListAV(APIView):
                     'strategy': form_data['projectInformation']['valorizationStrategy']['strategy'],
                     }
 
-        serializer = TnaProjectSerializer(data=tna_data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
+        tna_serializer = TnaProjectSerializer(data=tna_data)
+        if tna_serializer.is_valid():
+            tna_serializer.save()
+            return Response(tna_serializer.data)
         else:
-            return Response(serializer.errors)
+            return Response(tna_serializer.errors)
 
 
 class TnaDetailAV(APIView):
