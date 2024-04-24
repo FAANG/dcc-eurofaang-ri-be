@@ -43,11 +43,40 @@ class TnaProjectSerializer(serializers.ModelSerializer):
 
     # principal_investigator = PrincipalInvestigatorField(read_only=True)
 
-    # principal_investigator = UserSerializer()
+    # principal_investigator = UserSerializer(read_only=True)
+    # principal_investigator = serializers.CharField(source='User.id', read_only=True)
 
     class Meta:
         model = TnaProject
-        fields = "__all__"
+        # fields = "__all__"
+        fields = ('associated_application', 'principal_investigator', 'associated_application_title', 'project_title',
+                  'research_installation_1', 'research_installation_2', 'research_installation_3',
+                  'context','objective', 'impact', 'state_art', 'scientific_question_hypothesis',
+                  'approach', 'strategy', 'created', 'additional_participants', 'id'
+                  )
+
+    def to_representation(self, instance):
+        self.fields['principal_investigator'] = UserSerializer(read_only=True)
+        return super(TnaProjectSerializer, self).to_representation(instance)
 
         # depth = 1
         # exclude = ('password',)
+
+    # def create(self, validated_data):
+    #     tracks_data = validated_data.pop('principal_investigator')
+    #     album = Album.objects.create(**validated_data)
+    #     for track_data in tracks_data:
+    #         Track.objects.create(album=album, **track_data)
+    #     return album
+
+    # def create(self, validated_data):
+    #     principal_investigator = validated_data.pop('principal_investigator')
+    #     print(principal_investigator)
+    #
+    #     # get/(create if not exists) brand
+    #     # principal_investigator, _ = User.objects.filter(id=self.kwargs["pk"]).first()
+    #     #
+    #     # # print(brand_data) # OrderedDict([('name', 'adgg')])
+    #     # product = Product.objects.create(brand=principal_investigator, **validated_data)
+    #     #
+    #     # return product

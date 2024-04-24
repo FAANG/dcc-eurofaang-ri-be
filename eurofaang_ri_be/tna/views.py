@@ -31,33 +31,34 @@ class TnaListAV(APIView):
         form_data = request.data
 
         # map front-end request to DRF model
-
-        participants_list = form_data['participants']['participantFields']
-
         participants_ids = []
+        if 'participantFields' in form_data['participants']:
+            participants_list = form_data['participants']['participantFields']
 
-        for participant in participants_list:
-            participant_data = {
-                "username": self.generate_username(participant),
-                "first_name": participant['firstname'],
-                "last_name": participant['lastname'],
-                "email": participant['email'],
-                "phone_number": participant['phone'],
-                "organization_name": participant['organisation']['organisationName'],
-                "organization_address": participant['organisation']['organisationAddress'],
-                "organization_country": participant['organisation']['organisationCountry'],
-                "role": "AP"
-            }
-            user_serializer = UserSerializer(data=participant_data)
-            if user_serializer.is_valid():
-                user_serializer.save()
-                print(user_serializer.data)
-                participants_ids.append(user_serializer.data['id'])
-            else:
-                return Response(user_serializer.errors)
+            if len(participants_list) > 0:
+                for participant in participants_list:
+                    participant_data = {
+                        "username": self.generate_username(participant),
+                        "first_name": participant['firstname'],
+                        "last_name": participant['lastname'],
+                        "email": participant['email'],
+                        "phone_number": participant['phone'],
+                        "organization_name": participant['organisation']['organisationName'],
+                        "organization_address": participant['organisation']['organisationAddress'],
+                        "organization_country": participant['organisation']['organisationCountry'],
+                        "role": "AP"
+                    }
+                    user_serializer = UserSerializer(data=participant_data)
+                    if user_serializer.is_valid():
+                        user_serializer.save()
+                        print(user_serializer.data)
+                        participants_ids.append(user_serializer.data['id'])
+                    else:
+                        return Response(user_serializer.errors)
 
         tna_data = {'additional_participants': participants_ids,
                     'principal_investigator': form_data['principalInvestigator']['principalInvestigatorId'],
+                    # 'principal_investigator': form_data['principalInvestigator']['principalInvestigatorId'],
 
                     'associated_application': form_data['projectInformation']['applicationConnection'],
                     'associated_application_title': form_data['projectInformation']['associatedProjectTitle'],
