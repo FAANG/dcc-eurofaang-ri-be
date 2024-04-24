@@ -8,6 +8,8 @@ from rest_framework.authtoken.models import Token
 
 from eurofaang_ri_be.constants import COUNTRIES
 
+# from tna.serializers import TnaProjectSerializer
+
 
 class User(AbstractUser):
     def __str__(self):
@@ -36,6 +38,9 @@ class User(AbstractUser):
     organization_address = models.CharField(max_length=255, blank=True, null=True)
     organization_country = models.CharField(choices=COUNTRIES_CHOICES, blank=True, null=True)
     role = models.CharField(max_length=2, choices=ROLE_CHOICES, default='PI')
+    # tna_projects = TnaProjectSerializer(many=True, read_only=True)
+    # tna_project = models.ForeignKey('tna.TnaProject', on_delete=models.SET_NULL, null=True, blank=True, related_name="additional_participants")
+
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
