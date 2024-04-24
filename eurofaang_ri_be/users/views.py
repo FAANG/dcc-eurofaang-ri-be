@@ -52,6 +52,7 @@ class UserListAV(APIView):
         else:
             return Response(serializer.errors)
 
+
 class UserDetails(APIView):
     def get(self, request, pk):
         try:

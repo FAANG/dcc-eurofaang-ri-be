@@ -1,8 +1,5 @@
-from django.shortcuts import render
 from .models import TnaProject
-from django.http import JsonResponse
 from rest_framework.views import APIView
-
 from .serializers import TnaProjectSerializer
 from users.serializers import UserSerializer
 from rest_framework.response import Response
@@ -58,7 +55,6 @@ class TnaListAV(APIView):
 
         tna_data = {'additional_participants': participants_ids,
                     'principal_investigator': form_data['principalInvestigator']['principalInvestigatorId'],
-                    # 'principal_investigator': form_data['principalInvestigator']['principalInvestigatorId'],
 
                     'associated_application': form_data['projectInformation']['applicationConnection'],
                     'associated_application_title': form_data['projectInformation']['associatedProjectTitle'],

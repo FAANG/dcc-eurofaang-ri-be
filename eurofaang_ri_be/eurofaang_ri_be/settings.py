@@ -137,11 +137,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 REST_FRAMEWORK = {
-   # 'DEFAULT_PERMISSION_CLASSES': [
-   #     'rest_framework.permissions.IsAuthenticated',
-   # ],
+   'DEFAULT_PERMISSION_CLASSES': [
+       'rest_framework.permissions.IsAuthenticated',
+   ],
    'DEFAULT_AUTHENTICATION_CLASSES': (
-       # 'rest_framework.authentication.SessionAuthentication',
+       'rest_framework.authentication.SessionAuthentication',
        'rest_framework.authentication.TokenAuthentication',
    )
 }
@@ -152,6 +152,6 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 
-CSRF_TRUSTED_ORIGINS = ['https://dcc-eurofaang-ri-be-4qewew6boq-nw.a.run.app', 'http://localhost:8000']
+CSRF_TRUSTED_ORIGINS = ['https://dcc-eurofaang-ri-be-4qewew6boq-nw.a.run.app']
 
 AUTH_USER_MODEL = 'users.User'

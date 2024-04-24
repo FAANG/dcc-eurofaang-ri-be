@@ -1,5 +1,4 @@
 from django.db import models
-from users.serializers import UserSerializer
 
 
 class TnaProject(models.Model):
@@ -33,10 +32,8 @@ class TnaProject(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     principal_investigator = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name="tna_projects",
                                                default='', blank=True, null=True)
-    # additional_participants = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, blank=True)
+
     additional_participants = models.ManyToManyField('users.User', default='', blank=True, null=True)
-
-
 
     def __str__(self):
         return self.project_title
