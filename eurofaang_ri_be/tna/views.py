@@ -9,6 +9,26 @@ import random
 import string
 
 
+def generate_username(participant):
+    username = (participant['firstname'][0] + participant['lastname'] +
+                "".join(random.choices(string.ascii_lowercase + string.digits, k=3)))
+    return username
+
+
+def generate_participant_obj(participant):
+    return {
+        "username": generate_username(participant),
+        "first_name": participant['firstname'],
+        "last_name": participant['lastname'],
+        "email": participant['email'],
+        "phone_number": participant['phone'],
+        "organization_name": participant['organisation']['organisationName'],
+        "organization_address": participant['organisation']['organisationAddress'],
+        "organization_country": participant['organisation']['organisationCountry'],
+        "role": "AP"
+    }
+
+
 class TnaListAV(APIView):
     # permission_classes = [IsAuthenticated]
 
@@ -17,17 +37,7 @@ class TnaListAV(APIView):
         serializer = TnaProjectSerializer(tna_projects, many=True)
         return Response(serializer.data)
 
-    def generate_username(self, participant):
-        username = (participant['firstname'][0] + participant['lastname']
-                    .join(random.choices(string.ascii_lowercase +
-                                         string.digits, k=3)))
-        return username
-
-    def post(self, request):
-        print(request.data)
-        form_data = request.data
-
-        # map front-end request to DRF model
+    def generate_tna_drf_format(self, form_data):
         participants_ids = []
         if 'participantFields' in form_data['participants']:
             participants_list = form_data['participants']['participantFields']
@@ -35,7 +45,7 @@ class TnaListAV(APIView):
             if len(participants_list) > 0:
                 for participant in participants_list:
                     participant_data = {
-                        "username": self.generate_username(participant),
+                        "username": generate_username(participant),
                         "first_name": participant['firstname'],
                         "last_name": participant['lastname'],
                         "email": participant['email'],
@@ -77,6 +87,14 @@ class TnaListAV(APIView):
 
                     'strategy': form_data['projectInformation']['valorizationStrategy']['strategy'],
                     }
+        return tna_data
+
+    def post(self, request):
+        print(request.data)
+        form_data = request.data
+
+        # map front-end request to DRF model
+        tna_data = self.generate_tna_drf_format(form_data)
 
         tna_serializer = TnaProjectSerializer(data=tna_data)
         if tna_serializer.is_valid():
@@ -97,9 +115,67 @@ class TnaDetailAV(APIView):
         serializer = TnaProjectSerializer(movie)
         return Response(serializer.data)
 
+    def generate_tna_drf_format(self, form_data):
+        participants_ids = []
+        if 'participantFields' in form_data['participants']:
+            participants_list = form_data['participants']['participantFields']
+
+            if len(participants_list) > 0:
+                for participant in participants_list:
+                    if participant['id'] is not None:
+                        participants_ids.append(participant['id'])
+                    else:
+                        participant_data = {
+                            "username": generate_username(participant),
+                            "first_name": participant['firstname'],
+                            "last_name": participant['lastname'],
+                            "email": participant['email'],
+                            "phone_number": participant['phone'],
+                            "organization_name": participant['organisation']['organisationName'],
+                            "organization_address": participant['organisation']['organisationAddress'],
+                            "organization_country": participant['organisation']['organisationCountry'],
+                            "role": "AP"
+                        }
+                        user_serializer = UserSerializer(data=participant_data)
+                        if user_serializer.is_valid():
+                            user_serializer.save()
+                            print(user_serializer.data)
+                            participants_ids.append(user_serializer.data['id'])
+                        else:
+                            return Response(user_serializer.errors)
+
+        tna_data = {'additional_participants': participants_ids,
+                    'principal_investigator': form_data['principalInvestigator']['principalInvestigatorId'],
+
+                    'associated_application': form_data['projectInformation']['applicationConnection'],
+                    'associated_application_title': form_data['projectInformation']['associatedProjectTitle'],
+                    'project_title': form_data['projectInformation']['projectTitle'],
+                    'research_installation_1': form_data['projectInformation']['preferredResearchInstallation'][
+                        'preference1'],
+                    'research_installation_2': form_data['projectInformation']['preferredResearchInstallation'][
+                        'preference2'],
+                    'research_installation_3': form_data['projectInformation']['preferredResearchInstallation'][
+                        'preference3'],
+
+                    'context': form_data['projectInformation']['rationale']['context'],
+                    'objective': form_data['projectInformation']['rationale']['objective'],
+                    'impact': form_data['projectInformation']['rationale']['impact'],
+
+                    'state_art': form_data['projectInformation']['scientificQuality']['stateArt'],
+                    'approach': form_data['projectInformation']['scientificQuality']['approach'],
+                    'scientific_question_hypothesis': form_data['projectInformation']['scientificQuality'][
+                        'questionHypothesis'],
+
+                    'strategy': form_data['projectInformation']['valorizationStrategy']['strategy'],
+                    }
+        return tna_data
+
     def put(self, request, pk):
-        movie = TnaProject.objects.get(pk=pk)
-        serializer = TnaProjectSerializer(movie, data=request.data)
+        tna_project = TnaProject.objects.get(pk=pk)
+        # map front-end request to DRF model
+        tna_data = self.generate_tna_drf_format(request.data)
+
+        serializer = TnaProjectSerializer(tna_project, data=tna_data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

@@ -21,4 +21,5 @@ class TnaProjectSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         self.fields['principal_investigator'] = UserSerializer(read_only=True)
+        self.fields['additional_participants'] = UserSerializer(read_only=True, many=True)
         return super(TnaProjectSerializer, self).to_representation(instance)
