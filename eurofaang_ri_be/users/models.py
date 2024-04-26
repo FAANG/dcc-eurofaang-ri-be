@@ -5,7 +5,6 @@ from django.db.models.signals import post_save
 from django.db import models
 from django.core.validators import RegexValidator
 from rest_framework.authtoken.models import Token
-
 from eurofaang_ri_be.constants import COUNTRIES
 
 
