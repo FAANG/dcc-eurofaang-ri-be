@@ -54,21 +54,16 @@ def generate_tna_obj(form_data, participants_ids):
     return tna_obj
 
 
-class TnaListAV(APIView):
-    # permission_classes = [IsAuthenticated]
+def generate_tna_drf_format(form_data):
+    participants_ids = []
+    if 'participantFields' in form_data['participants']:
+        participants_list = form_data['participants']['participantFields']
 
-    def get(self, request):
-        tna_projects = TnaProject.objects.all()
-        serializer = TnaProjectSerializer(tna_projects, many=True)
-        return Response(serializer.data)
-
-    def generate_tna_drf_format(self, form_data):
-        participants_ids = []
-        if 'participantFields' in form_data['participants']:
-            participants_list = form_data['participants']['participantFields']
-
-            if len(participants_list) > 0:
-                for participant in participants_list:
+        if len(participants_list) > 0:
+            for participant in participants_list:
+                if participant['id'] is not None:
+                    participants_ids.append(participant['id'])
+                else:
                     participant_data = generate_participant_obj(participant)
                     user_serializer = UserSerializer(data=participant_data)
                     if user_serializer.is_valid():
@@ -78,15 +73,24 @@ class TnaListAV(APIView):
                     else:
                         return Response(user_serializer.errors)
 
-        tna_data = generate_tna_obj(form_data, participants_ids)
-        return tna_data
+    tna_data = generate_tna_obj(form_data, participants_ids)
+    return tna_data
+
+
+class TnaListAV(APIView):
+    # permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        tna_projects = TnaProject.objects.all()
+        serializer = TnaProjectSerializer(tna_projects, many=True)
+        return Response(serializer.data)
 
     def post(self, request):
         print(request.data)
         form_data = request.data
 
         # map front-end request to DRF model
-        tna_data = self.generate_tna_drf_format(form_data)
+        tna_data = generate_tna_drf_format(form_data)
 
         tna_serializer = TnaProjectSerializer(data=tna_data)
         if tna_serializer.is_valid():
@@ -107,32 +111,10 @@ class TnaDetailAV(APIView):
         serializer = TnaProjectSerializer(movie)
         return Response(serializer.data)
 
-    def generate_tna_drf_format(self, form_data):
-        participants_ids = []
-        if 'participantFields' in form_data['participants']:
-            participants_list = form_data['participants']['participantFields']
-
-            if len(participants_list) > 0:
-                for participant in participants_list:
-                    if participant['id'] is not None:
-                        participants_ids.append(participant['id'])
-                    else:
-                        participant_data = generate_participant_obj(participant)
-                        user_serializer = UserSerializer(data=participant_data)
-                        if user_serializer.is_valid():
-                            user_serializer.save()
-                            print(user_serializer.data)
-                            participants_ids.append(user_serializer.data['id'])
-                        else:
-                            return Response(user_serializer.errors)
-
-        tna_data = generate_tna_obj(form_data, participants_ids)
-        return tna_data
-
     def put(self, request, pk):
         tna_project = TnaProject.objects.get(pk=pk)
         # map front-end request to DRF model
-        tna_data = self.generate_tna_drf_format(request.data)
+        tna_data = generate_tna_drf_format(request.data)
 
         serializer = TnaProjectSerializer(tna_project, data=tna_data)
         if serializer.is_valid():
