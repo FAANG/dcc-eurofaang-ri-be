@@ -7,6 +7,8 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 import random
 import string
+from rest_framework import viewsets
+from django.shortcuts import get_object_or_404
 
 
 def generate_username(participant):
@@ -75,6 +77,69 @@ def generate_tna_drf_format(form_data):
 
     tna_data = generate_tna_obj(form_data, participants_ids)
     return tna_data
+
+
+class TnaListVS(viewsets.ModelViewSet):
+    queryset = TnaProject.objects.all()
+    serializer_class = TnaProjectSerializer
+
+    def create(self, request, *args, **kwargs):
+        form_data = request.data
+
+        # map front-end request to DRF model
+        tna_data = generate_tna_drf_format(form_data)
+
+        serializer = self.get_serializer(data=tna_data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def update(self, request, *args, **kwargs):
+        # map front-end request to DRF model
+        tna_data = generate_tna_drf_format(request.data)
+
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=tna_data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
+
+    # permission_classes = [IsAdminOrReadOnly]
+    # throttle_classes = [AnonRateThrottle]
+
+# class TnaListVS(viewsets.ViewSet):
+#
+#     def list(self, request):
+#         queryset = TnaProject.objects.all()
+#         serializer = TnaProjectSerializer(queryset, many=True)
+#         return Response(serializer.data)
+#
+#     def retrieve(self, request, pk=None):
+#         queryset = TnaProject.objects.all()
+#         watchlist = get_object_or_404(queryset, pk=pk)
+#         serializer = TnaProjectSerializer(watchlist)
+#         return Response(serializer.data)
+#
+#     def create(self, request):
+#         form_data = request.data
+#
+#         # map front-end request to DRF model
+#         tna_data = generate_tna_drf_format(form_data)
+#
+#         serializer = TnaProjectSerializer(data=tna_data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         else:
+#             return Response(serializer.errors)
 
 
 class TnaListAV(APIView):
