@@ -8,16 +8,18 @@ class PrincipalInvestigatorField(serializers.RelatedField):
         return f'{value.first_name} {value.last_name}'
 
 
-class TnaProjectSerializer(serializers.ModelSerializer):
+class TnaProjectSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = TnaProject
         # fields = "__all__"
-        fields = ('associated_application', 'principal_investigator', 'associated_application_title', 'project_title',
+        fields = ('url', 'id', 'associated_application', 'principal_investigator', 'associated_application_title', 'project_title',
                   'research_installation_1', 'research_installation_2', 'research_installation_3',
                   'context','objective', 'impact', 'state_art', 'scientific_question_hypothesis',
-                  'approach', 'strategy', 'created', 'additional_participants', 'id'
-                  )
+                  'approach', 'strategy', 'created', 'additional_participants')
+        extra_kwargs = {
+            # 'url': {'lookup_field': 'id'}
+        }
 
     def to_representation(self, instance):
         self.fields['principal_investigator'] = UserSerializer(read_only=True)
