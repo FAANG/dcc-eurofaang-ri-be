@@ -8,12 +8,12 @@ class PrincipalInvestigatorField(serializers.RelatedField):
         return f'{value.first_name} {value.last_name}'
 
 
-class TnaProjectSerializer(serializers.HyperlinkedModelSerializer):
+class TnaProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TnaProject
         # fields = "__all__"
-        fields = ('url', 'id', 'associated_application', 'principal_investigator', 'associated_application_title', 'project_title',
+        fields = ('id', 'associated_application', 'principal_investigator', 'associated_application_title', 'project_title',
                   'research_installation_1', 'research_installation_2', 'research_installation_3',
                   'context','objective', 'impact', 'state_art', 'scientific_question_hypothesis',
                   'approach', 'strategy', 'created', 'additional_participants')

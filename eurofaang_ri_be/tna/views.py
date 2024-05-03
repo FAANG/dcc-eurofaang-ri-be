@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 import random
 import string
+import requests
 from rest_framework import viewsets
 
 
@@ -66,12 +67,20 @@ def generate_tna_drf_format(form_data):
                     participants_ids.append(participant['id'])
                 else:
                     participant_data = generate_participant_obj(participant)
+
+                    # url = '/users/'
+                    # data = {}  # post data
+                    # api_call = requests.post(url, headers={}, data=participant_data)
+                    # print(api_call.json())
+
+
                     user_serializer = UserSerializer(data=participant_data)
                     if user_serializer.is_valid():
                         user_serializer.save()
                         print(user_serializer.data)
                         participants_ids.append(user_serializer.data['id'])
                     else:
+                        print(user_serializer.errors)
                         return Response(user_serializer.errors)
 
     tna_data = generate_tna_obj(form_data, participants_ids)
@@ -81,6 +90,7 @@ def generate_tna_drf_format(form_data):
 class TnaProjectViewSet(viewsets.ModelViewSet):
     queryset = TnaProject.objects.all()
     serializer_class = TnaProjectSerializer
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         form_data = request.data
@@ -111,32 +121,8 @@ class TnaProjectViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
-    # permission_classes = [IsAdminOrReadOnly]
     # throttle_classes = [AnonRateThrottle]
 
-
-
-# class TnaListAV(APIView):
-#     # permission_classes = [IsAuthenticated]
-#
-#     def get(self, request):
-#         tna_projects = TnaProject.objects.all()
-#         serializer = TnaProjectSerializer(tna_projects, many=True)
-#         return Response(serializer.data)
-#
-#     def post(self, request):
-#         print(request.data)
-#         form_data = request.data
-#
-#         # map front-end request to DRF model
-#         tna_data = generate_tna_drf_format(form_data)
-#
-#         tna_serializer = TnaProjectSerializer(data=tna_data)
-#         if tna_serializer.is_valid():
-#             tna_serializer.save()
-#             return Response(tna_serializer.data)
-#         else:
-#             return Response(tna_serializer.errors)
 
 
 
