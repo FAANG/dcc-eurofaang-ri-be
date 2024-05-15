@@ -1,10 +1,16 @@
 from django.db import models
-
+from django.conf import settings
+User = settings.AUTH_USER_MODEL
 
 class TnaProject(models.Model):
     YES_NO_CHOICES = (
         ('yes', 'Yes'),
         ('no', 'No'),
+    )
+
+    STATUSES = (
+        ('saved', 'saved'),
+        ('submitted', 'submitted'),
     )
 
     associated_application = models.CharField(choices=YES_NO_CHOICES, default='', blank=True)
@@ -30,6 +36,10 @@ class TnaProject(models.Model):
     principal_investigator = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name="tna_projects",
                                                default='', blank=True, null=True)
     additional_participants = models.ManyToManyField('users.User', default='', blank=True, null=True)
+    tna_owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="owned_projects",
+                                  default='', blank=True, null=True)
+
+    record_status = models.CharField(choices=STATUSES, default='', blank=True)
 
     def __str__(self):
         return self.project_title
