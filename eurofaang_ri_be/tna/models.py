@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 User = settings.AUTH_USER_MODEL
 
+
 class TnaProject(models.Model):
     YES_NO_CHOICES = (
         ('yes', 'Yes'),

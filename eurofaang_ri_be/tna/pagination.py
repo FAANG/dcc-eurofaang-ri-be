@@ -2,19 +2,6 @@ from rest_framework.pagination import PageNumberPagination, LimitOffsetPaginatio
 
 
 class TnaPagination(PageNumberPagination):
-    page_size = 5
+    page_size = 10
     page_size_query_param = 'size'
     max_page_size = 100
-
-
-class WatchListLOPagination(LimitOffsetPagination):
-    default_limit = 5
-    max_limit = 10
-    limit_query_param = 'limit'
-    offset_query_param = 'start'
-
-
-class WatchListCPagination(CursorPagination):
-    page_size = 5
-    ordering = 'created'
-    cursor_query_param = 'record'

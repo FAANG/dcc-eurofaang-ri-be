@@ -15,7 +15,6 @@ class TnaProjectSerializer(serializers.ModelSerializer):
     tna_owner = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
         model = TnaProject
-        # fields = "__all__"
         fields = (
         'id', 'associated_application', 'principal_investigator', 'associated_application_title', 'project_title',
         'research_installation_1', 'research_installation_2', 'research_installation_3',

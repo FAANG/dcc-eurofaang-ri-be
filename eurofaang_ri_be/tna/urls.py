@@ -7,8 +7,5 @@ router.register('tna', TnaProjectViewSet, basename='tna')
 
 app_name = 'tna'
 urlpatterns = [
-    # path('list/', TnaListAV.as_view(), name='tna-list'),
-    # path('<int:pk>/', TnaDetailAV.as_view(), name='tna-detail'),
-
     path('', include(router.urls)),
 ]
