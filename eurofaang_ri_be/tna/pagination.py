@@ -1,4 +1,4 @@
-from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination, CursorPagination
+from rest_framework.pagination import PageNumberPagination
 
 
 class TnaPagination(PageNumberPagination):
