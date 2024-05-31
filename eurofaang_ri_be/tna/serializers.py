@@ -34,6 +34,18 @@ class TnaProjectSerializer(serializers.ModelSerializer):
         tna_data = generate_tna_drf_format(data)
         return super(TnaProjectSerializer, self).to_internal_value(tna_data)
 
+    # Works but not required
+    # def validate(self, data):
+    #     print("inside validation")
+    #     print(data)
+    #     if data['record_status'] == 'saved':
+    #         for x, y in data.items():
+    #             if x == 'participants':
+    #                 continue
+    #             if not y:
+    #                 raise serializers.ValidationError("The fields in the form cannot be left blank")
+    #     return data
+
 
 def generate_tna_drf_format(form_data):
     participants_ids = []

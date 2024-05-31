@@ -2,18 +2,18 @@ from django.db import models
 from django.conf import settings
 User = settings.AUTH_USER_MODEL
 
+YES_NO_CHOICES = (
+    ('yes', 'Yes'),
+    ('no', 'No'),
+)
+
+STATUSES = (
+    ('saved', 'saved'),
+    ('submitted', 'submitted'),
+)
+
 
 class TnaProject(models.Model):
-    YES_NO_CHOICES = (
-        ('yes', 'Yes'),
-        ('no', 'No'),
-    )
-
-    STATUSES = (
-        ('saved', 'saved'),
-        ('submitted', 'submitted'),
-    )
-
     associated_application = models.CharField(choices=YES_NO_CHOICES, default='', blank=True)
     associated_application_title = models.ForeignKey('self', on_delete=models.SET_NULL,
                                                      related_name="associated_project", null=True,
