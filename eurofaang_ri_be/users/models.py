@@ -36,6 +36,11 @@ class User(AbstractUser):
     organization_country = models.CharField(choices=COUNTRIES_CHOICES, blank=True, null=True)
     role = models.CharField(max_length=2, choices=ROLE_CHOICES, default='PI')
 
+    def save(self, *args, **kwargs):
+        if self.password and (self.pk is None or User.objects.get(pk=self.pk).password != self.password):
+            self.set_password(self.password)
+        super().save(*args, **kwargs)
+
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
