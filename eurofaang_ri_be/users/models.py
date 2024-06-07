@@ -37,12 +37,8 @@ class User(AbstractUser):
     role = models.CharField(max_length=2, choices=ROLE_CHOICES, default='PI')
 
     def save(self, *args, **kwargs):
-        if self.pk is None and self.password:
+        if self.password and (self.pk is None or User.objects.get(pk=self.pk).password != self.password):
             self.set_password(self.password)
-        elif self.pk is not None:
-            old_user = User.objects.get(pk=self.pk)
-            if old_user.password != self.password:
-                self.set_password(self.password)
         super().save(*args, **kwargs)
 
 
