@@ -30,35 +30,38 @@ class TnaProjectSerializer(serializers.ModelSerializer):
         return super(TnaProjectSerializer, self).to_representation(instance)
 
     def to_internal_value(self, data):
-        print(data)
         tna_data = generate_tna_drf_format(data)
         return super(TnaProjectSerializer, self).to_internal_value(tna_data)
 
-    # Works but not required
-    # def validate(self, data):
-    #     print("inside validation")
-    #     print(data)
-    #     if data['record_status'] == 'saved':
-    #         for x, y in data.items():
-    #             if x == 'participants':
-    #                 continue
-    #             if not y:
-    #                 raise serializers.ValidationError("The fields in the form cannot be left blank")
-    #     return data
+    def validate(self, data):
+        print("inside validation")
+        print(data)
+        if data['record_status'] == 'submitted':
+            for x, y in data.items():
+                print(x, y)
+                # "additional_participants": [] can be an empty list
+                if x == 'additional_participants':
+                    continue
+                if not y:
+                    raise serializers.ValidationError("The fields in the form cannot be left blank if you are "
+                                                      "SUBMITTING the data.")
+        return data
 
 
 def generate_tna_drf_format(form_data):
+
     participants_ids = []
     if 'participantFields' in form_data['participants']:
         participants_list = form_data['participants']['participantFields']
 
         if len(participants_list) > 0:
             for participant in participants_list:
-                if participant['id'] is not None:
+                if "id" in participant and participant['id'] is not None:
                     participants_ids.append(participant['id'])
+                elif "existingParticipants" in participant and participant['existingParticipants'] is not None:
+                    participants_ids.append(participant['existingParticipants'])
                 else:
                     participant_data = generate_participant_obj(participant)
-
                     user_serializer = UserSerializer(data=participant_data)
                     if user_serializer.is_valid():
                         user_serializer.save()
@@ -69,6 +72,11 @@ def generate_tna_drf_format(form_data):
                         return Response(user_serializer.errors)
 
     tna_data = generate_tna_obj(form_data, participants_ids)
+    print("tna_data:")
+    print(tna_data)
+    import json
+    json_object = json.dumps(tna_data, indent=4)
+    print(json_object)
     return tna_data
 
 

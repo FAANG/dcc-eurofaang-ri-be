@@ -5,7 +5,6 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
     """
     Custom permission to only allow owners of an object to edit it.
     """
-
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
@@ -16,7 +15,6 @@ class SubmittedReadOnly(permissions.BasePermission):
     """
     Custom permission to prevent submitted record to be edited.
     """
-
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
