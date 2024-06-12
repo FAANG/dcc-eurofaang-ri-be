@@ -67,8 +67,6 @@ def generate_tna_drf_format(form_data):
                         return Response(user_serializer.errors)
 
     tna_data = generate_tna_obj(form_data, participants_ids)
-    import json
-    json_object = json.dumps(tna_data, indent=4)
     return tna_data
 
 
