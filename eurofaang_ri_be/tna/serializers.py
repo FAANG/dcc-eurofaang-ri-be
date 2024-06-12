@@ -34,11 +34,8 @@ class TnaProjectSerializer(serializers.ModelSerializer):
         return super(TnaProjectSerializer, self).to_internal_value(tna_data)
 
     def validate(self, data):
-        print("inside validation")
-        print(data)
         if data['record_status'] == 'submitted':
             for x, y in data.items():
-                print(x, y)
                 # "additional_participants": [] can be an empty list
                 if x == 'additional_participants':
                     continue
@@ -65,18 +62,13 @@ def generate_tna_drf_format(form_data):
                     user_serializer = UserSerializer(data=participant_data)
                     if user_serializer.is_valid():
                         user_serializer.save()
-                        print(user_serializer.data)
                         participants_ids.append(user_serializer.data['id'])
                     else:
-                        print(user_serializer.errors)
                         return Response(user_serializer.errors)
 
     tna_data = generate_tna_obj(form_data, participants_ids)
-    print("tna_data:")
-    print(tna_data)
     import json
     json_object = json.dumps(tna_data, indent=4)
-    print(json_object)
     return tna_data
 
 
