@@ -1,3 +1,5 @@
+from django.db.models import Q
+
 from .models import TnaProject
 from .serializers import TnaProjectSerializer
 from rest_framework import viewsets
@@ -9,7 +11,6 @@ from .pagination import TnaPagination
 
 
 class TnaProjectViewSet(viewsets.ModelViewSet):
-    queryset = TnaProject.objects.all()
     serializer_class = TnaProjectSerializer
     permission_classes = [IsOwnerOrReadOnly, SubmittedReadOnly]
 
@@ -22,6 +23,11 @@ class TnaProjectViewSet(viewsets.ModelViewSet):
     ordering_fields = ['project_title', 'principal_investigator__first_name', 'principal_investigator__last_name',
                         'associated_application', 'id']
 
+    def get_queryset(self):
+        return TnaProject.objects.filter(
+            Q(tna_owner=self.request.user) | Q(additional_participants=self.request.user)
+        )
+
     def perform_create(self, serializer):
         serializer.save(tna_owner=self.request.user)
 
@@ -29,7 +35,3 @@ class TnaProjectViewSet(viewsets.ModelViewSet):
         if 'pagination' in self.request.query_params and self.request.query_params['pagination'] == 'false':
             return None
         return super().paginate_queryset(queryset)
-
-
-
-
