@@ -11,6 +11,12 @@ class PrincipalInvestigatorField(serializers.RelatedField):
         return f'{value.first_name} {value.last_name}'
 
 
+class AssociatedProjectField(serializers.ModelSerializer):
+    class Meta:
+        model = TnaProject
+        fields = ('id', 'project_title')
+
+
 class TnaProjectSerializer(serializers.ModelSerializer):
     tna_owner = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
@@ -27,33 +33,44 @@ class TnaProjectSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         self.fields['principal_investigator'] = UserSerializer(read_only=True)
         self.fields['additional_participants'] = UserSerializer(read_only=True, many=True)
+        self.fields['associated_application_title'] = AssociatedProjectField(read_only=True)
         return super(TnaProjectSerializer, self).to_representation(instance)
 
     def to_internal_value(self, data):
-        print(data)
         tna_data = generate_tna_drf_format(data)
         return super(TnaProjectSerializer, self).to_internal_value(tna_data)
 
+    def validate(self, data):
+        if data['record_status'] == 'submitted':
+            for key, value in data.items():
+                # "additional_participants": [] can be an empty list
+                if key == 'additional_participants':
+                    continue
+                if not value:
+                    raise serializers.ValidationError("The fields in the form cannot be left blank if you are "
+                                                      "SUBMITTING the data.")
+        return data
+
 
 def generate_tna_drf_format(form_data):
+
     participants_ids = []
     if 'participantFields' in form_data['participants']:
         participants_list = form_data['participants']['participantFields']
 
         if len(participants_list) > 0:
             for participant in participants_list:
-                if participant['id'] is not None:
+                if "id" in participant and participant['id'] is not None:
                     participants_ids.append(participant['id'])
+                elif "existingParticipants" in participant and participant['existingParticipants'] is not None:
+                    participants_ids.append(participant['existingParticipants'])
                 else:
                     participant_data = generate_participant_obj(participant)
-
                     user_serializer = UserSerializer(data=participant_data)
                     if user_serializer.is_valid():
                         user_serializer.save()
-                        print(user_serializer.data)
                         participants_ids.append(user_serializer.data['id'])
                     else:
-                        print(user_serializer.errors)
                         return Response(user_serializer.errors)
 
     tna_data = generate_tna_obj(form_data, participants_ids)
