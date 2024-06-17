@@ -11,6 +11,12 @@ class PrincipalInvestigatorField(serializers.RelatedField):
         return f'{value.first_name} {value.last_name}'
 
 
+class AssociatedProjectField(serializers.ModelSerializer):
+    class Meta:
+        model = TnaProject
+        fields = ('id', 'project_title')
+
+
 class TnaProjectSerializer(serializers.ModelSerializer):
     tna_owner = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
@@ -27,6 +33,7 @@ class TnaProjectSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         self.fields['principal_investigator'] = UserSerializer(read_only=True)
         self.fields['additional_participants'] = UserSerializer(read_only=True, many=True)
+        self.fields['associated_application_title'] = AssociatedProjectField(read_only=True)
         return super(TnaProjectSerializer, self).to_representation(instance)
 
     def to_internal_value(self, data):
