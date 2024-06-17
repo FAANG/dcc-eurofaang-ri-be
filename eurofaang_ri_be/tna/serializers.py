@@ -42,11 +42,11 @@ class TnaProjectSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         if data['record_status'] == 'submitted':
-            for x, y in data.items():
+            for key, value in data.items():
                 # "additional_participants": [] can be an empty list
-                if x == 'additional_participants':
+                if key == 'additional_participants':
                     continue
-                if not y:
+                if not value:
                     raise serializers.ValidationError("The fields in the form cannot be left blank if you are "
                                                       "SUBMITTING the data.")
         return data
