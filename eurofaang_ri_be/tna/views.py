@@ -1,8 +1,10 @@
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
+from rest_framework.response import Response
 
 from .models import TnaProject
 from .serializers import TnaProjectSerializer
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from .permissions import IsOwnerOrReadOnly, SubmittedReadOnly
 
 from rest_framework import filters
@@ -27,6 +29,17 @@ class TnaProjectViewSet(viewsets.ModelViewSet):
         return TnaProject.objects.filter(
             Q(tna_owner=self.request.user) | Q(additional_participants=self.request.user)
         )
+
+    def retrieve(self, request, *args, **kwargs):
+        project = get_object_or_404(TnaProject, pk=kwargs['pk'])
+
+        queryset = self.get_queryset()
+        if not queryset.filter(pk=kwargs['pk']).exists():
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        self.check_object_permissions(request, project)
+        serializer = self.get_serializer(project)
+        return Response(serializer.data)
 
     def perform_create(self, serializer):
         serializer.save(tna_owner=self.request.user)
