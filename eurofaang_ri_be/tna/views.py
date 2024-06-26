@@ -20,7 +20,7 @@ class TnaProjectViewSet(viewsets.ModelViewSet):
                      'approach', 'strategy', 'research_installation_1', 'research_installation_2',
                      'research_installation_3']
     ordering_fields = ['project_title', 'principal_investigator__first_name', 'principal_investigator__last_name',
-                        'associated_application', 'id']
+                        'associated_application', 'id', 'record_status']
 
     def perform_create(self, serializer):
         serializer.save(tna_owner=self.request.user)
