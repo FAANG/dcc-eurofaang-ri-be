@@ -27,13 +27,8 @@ class TnaProjectViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        target_user_id = self.request.query_params.get('user_id')
-
         user_filter = Q(tna_owner=user) | Q(additional_participants=user)
-        if target_user_id:
-            user_filter &= Q(tna_owner_id=target_user_id) | Q(additional_participants__id=target_user_id)
-
-        return TnaProject.objects.filter(user_filter)
+        return TnaProject.objects.filter(user_filter).distinct()
 
     def retrieve(self, request, *args, **kwargs):
         project = get_object_or_404(TnaProject, pk=kwargs['pk'])
