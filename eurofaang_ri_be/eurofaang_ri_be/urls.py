@@ -8,7 +8,7 @@ from django.urls import include, path
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet)
-router.register(r'tna', TnaProjectViewSet)
+router.register(r'tna', TnaProjectViewSet, basename='tna')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

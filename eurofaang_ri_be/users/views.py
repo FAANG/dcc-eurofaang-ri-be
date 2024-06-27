@@ -1,4 +1,6 @@
-from rest_framework import viewsets
+from django.shortcuts import get_object_or_404
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -11,6 +13,21 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
+
+    def retrieve(self, request, *args, **kwargs):
+        user = get_object_or_404(User, pk=kwargs['pk'])
+
+        if str(request.user.id) != kwargs['pk']:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        serializer = self.get_serializer(user)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['get'], url_path='details')
+    def get_user_details(self, request, pk=None):
+        user = get_object_or_404(User, pk=pk)
+        serializer = self.get_serializer(user)
+        return Response(serializer.data)
 
 
 class UserLogIn(ObtainAuthToken):
