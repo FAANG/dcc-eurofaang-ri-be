@@ -46,8 +46,6 @@ class TnaProjectSerializer(serializers.ModelSerializer):
                 # "additional_participants": [] can be an empty list
                 if key == 'additional_participants':
                     continue
-                if key == 'associated_application_title' and data['associated_application'] == 'no':
-                    continue
                 if not value:
                     raise serializers.ValidationError("The fields in the form cannot be left blank if you are "
                                                       "SUBMITTING the data.")
